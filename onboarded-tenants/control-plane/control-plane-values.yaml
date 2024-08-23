@@ -1,0 +1,450 @@
+# Default values for helm.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+strategy:
+  type: RollingUpdate
+  maxUnavailable: 0
+  maxSurge: 1
+app:
+  url: ""
+  basePath: ""
+livenessProbe:
+  enabled: false
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 7
+readinessProbe:
+  enabled: false
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 5
+  
+frontend:
+  enabled: true
+  repository: public.ecr.aws/p1a1c8p2/sourcefuse-arc-saas-control-plane-ui
+  pullPolicy: Always
+  tag: "0.0.4"
+  log_level: "info"
+  home_path: "/main/home"
+  replicaCount: 1
+  affinity: {}
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "2"
+  Service:
+    type: NodePort
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  extraAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "3000"
+    sidecar.istio.io/inject: "true"
+    enabled: "1"
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 20
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 80
+
+#tenantMgmtFacade
+tenantMgmtFacade:
+  enabled: true
+  repository: public.ecr.aws/p1a1c8p2/sourcefuse-arc-saas-control-plane-tenant-management-facade
+  pullPolicy: Always
+  tag: "0.0.3"
+  replicaCount: 1
+  port: 3000
+  node_env: "production"
+  log_level: "info"
+  from_email: no-reply@arc-saas.net
+  csp_script_src_hash: 'sha256-DLbdWNBhwD1fyzUBjaE5Up3Y/4UCDB1OYv/c61qHL/I='
+  affinity: {}
+  allowed_origins: "*"
+  imagePullPolicy:
+    enabled: "yes"
+    name: regcred
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "2048Mi"
+      cpu: "1"
+  service:
+    type: NodePort
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 1
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 80
+  base_path: /tenant-mgmt-facade
+
+#Services
+#auditService
+auditService:
+  enabled: true
+  repository: public.ecr.aws/p1a1c8p2/sourcefuse-arc-saas-control-plane-audit-service
+  pullPolicy: Always
+  tag: "0.0.1"
+  replicaCount: 1
+  port: 3000
+  node_env: "production"
+  log_level: "info"
+  affinity: {}
+  allowed_origins: "*"
+  imagePullPolicy:
+    enabled: "yes"
+    name: regcred
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "2048Mi"
+      cpu: "1"
+  service:
+    type: NodePort
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 1
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 80
+  base_path: /audit-service
+
+#authenticationService
+authenticationService:
+  enabled: true
+  repository: public.ecr.aws/p1a1c8p2/sourcefuse-arc-saas-control-plane-authentication-service
+  pullPolicy: Always
+  tag: "0.0.1"
+  replicaCount: 1
+  port: 3000
+  node_env: "production"
+  log_level: "info"
+  affinity: {}
+  allowed_origins: "*"
+  imagePullPolicy:
+    enabled: "yes"
+    name: regcred
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "2048Mi"
+      cpu: "1"
+  service:
+    type: NodePort
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 1
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 80
+  base_path: /authentication-service
+
+
+  
+#notificationService
+notificationService:
+  enabled: true
+  repository: public.ecr.aws/p1a1c8p2/sourcefuse-arc-saas-control-plane-notification-service
+  pullPolicy: Always
+  tag: "0.0.1"
+  replicaCount: 1
+  port: 3000
+  node_env: "production"
+  log_level: "info"
+  smtp_port: "587"
+  affinity: {}
+  allowed_origins: "*"
+  imagePullPolicy:
+    enabled: "yes"
+    name: regcred
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "2048Mi"
+      cpu: "1"
+  service:
+    type: NodePort
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 1
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 80
+  base_path: /notification-service
+
+#subscriptionService
+subscriptionService:
+  enabled: true
+  repository: public.ecr.aws/p1a1c8p2/sourcefuse-arc-saas-control-plane-subscription-service
+  pullPolicy: Always
+  tag: "0.0.2"
+  replicaCount: 1
+  port: 3000
+  node_env: "production"
+  log_level: "info"
+  affinity: {}
+  allowed_origins: "*"
+  imagePullPolicy:
+    enabled: "yes"
+    name: regcred
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "2048Mi"
+      cpu: "1"
+  service:
+    type: NodePort
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 1
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 80
+  base_path: /subscription-service
+
+#userTenantService
+userTenantService:
+  enabled: true
+  repository: public.ecr.aws/p1a1c8p2/sourcefuse-arc-saas-control-plane-user-tenant-service
+  pullPolicy: Always
+  tag: "0.0.1"
+  replicaCount: 1
+  port: 3000
+  node_env: "production"
+  log_level: "info"
+  affinity: {}
+  allowed_origins: "*"
+  imagePullPolicy:
+    enabled: "yes"
+    name: regcred
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "2048Mi"
+      cpu: "1"
+  service:
+    type: NodePort
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 1
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 80
+  base_path: /user-tenant-service
+  
+#tenantMgmtService
+tenantMgmtService:
+  enabled: true
+  repository: public.ecr.aws/p1a1c8p2/sourcefuse-arc-saas-control-plane-tenant-management-service
+  pullPolicy: Always
+  tag: "0.0.3"
+  replicaCount: 1
+  port: 3000
+  node_env: "production"
+  log_level: "info"
+  from_email: no-reply@arc-saas.net
+  system_user_id: ""
+  app_login_url: ""
+  affinity: {}
+  allowed_origins: "*"
+  imagePullPolicy:
+    enabled: "yes"
+    name: regcred
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "2048Mi"
+      cpu: "1"
+  service:
+    type: NodePort
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 1
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 80
+  base_path: /tenant-mgmt-service
+
+
+#migrationJob
+migrationJob:
+#enable it when correct image has been provided
+  enabled: true
+  repository: public.ecr.aws/p1a1c8p2/sourcefuse-arc-saas-control-plane-migration
+  pullPolicy: Always
+  tag: "0.0.2"
+  replicaCount: 1
+  affinity: {}
+  allowed_origins: "*"
+  imagePullPolicy:
+    enabled: "yes"
+    name: regcred
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "2048Mi"
+      cpu: "1"
+  service:
+    type: NodePort
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+
+
+imagePullSecret:
+#enable it and pass the correct parameters below
+  enabled: false
+  name: regcred
+  registry: https://index.docker.io/v1/
+  username: ''
+  password: ''
+  email: sfdevops@sourcefuse.com
+
+nameOverride: ""
+
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+# fsGroup: 2000
+
+securityContext: {}
+# capabilities:
+#   drop:
+#   - ALL
+# readOnlyRootFilesystem: true
+# runAsNonRoot: true
+# runAsUser: 1000
+
+
+resources: {}
+# We usually recommend not to specify default resources and to leave this as a conscious
+# choice for the user. This also increases chances charts run on environments with little
+# resources, such as Minikube. If you do want to specify resources, uncomment the following
+# lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+# limits:
+#   cpu: 100m
+#   memory: 128Mi
+# requests:
+#   cpu: 100m
+#   memory: 128Mi
+
+extraAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "3000"
+  sidecar.istio.io/inject: "true"
+  enabled: "1"
+
+nodeSelector: {}
+
+tolerations:
+  - effect: NoSchedule
+    key: type
+    operator: Equal
+    value: ""
+
+affinity: {}
+
+## if ses is enabled then generate smtp creds and store in ssm parameter 
+ses:
+  enabled: true
+
+##Migration env variable
+tenantName: SOURCEFUSE
+tenantKey: "sourcefuse"
+tenantSecret: "ac21f52a1056de6dfc003653e508bytr"
+tenantEmail: harshit.kumar+1@sourcefuse.com
+adminUserTenantId: "b439829b-57e7-49d8-bb23-8ccb2ca97127"
+cognitoUser: sourcefuse
+cognitoSub: 2851f3e0-20c1-70df-c858-79ed5f7f2e52
+
+clientId: "tata-elxsi-control-plane"
+publicKey: "TrPbi0xJT"
+          
+
+saname: "control-plane"
+region: us-west-2
+environment: dev
+controlPlaneHost: arc-saas.net
+domain: arc-saas.net
+arn: arn:aws:iam::471112653618:role/sf-arc-saas-dev-control-plane-role
+namespace: control-plane
+projectName: sf-arc-saas
+# ssm parameter name
+dbhost: /sf-arc-saas/dev/db_host
+dbport: /sf-arc-saas/dev/db_port
+dbuser: /sf-arc-saas/dev/db_user
+dbpassword: /sf-arc-saas/dev/db_password
+dbschema: /sf-arc-saas/dev/db_schema
+redishost: /sf-arc-saas/dev/redis_host
+redisport: /sf-arc-saas/dev/redis_port
+redispassword: /sf-arc-saas/dev/redis-password
+redisdatabase: /sf-arc-saas/dev/redis-database
+jwtsecret: /sf-arc-saas/dev/jwt_secret
+jwtissuer: /sf-arc-saas/dev/jwt_issuer
+authenticationdbdatabase: /sf-arc-saas/dev/authenticationdbdatabase
+auditdbdatabase: /sf-arc-saas/dev/auditdbdatabase
+notificationdbdatabase: /sf-arc-saas/dev/notificationdbdatabase
+subscriptiondbdatabase: /sf-arc-saas/dev/subscriptiondbdatabase
+userdbdatabase: /sf-arc-saas/dev/userdbdatabase
+tenantmgmtdbdatabase: /sf-arc-saas/dev/tenantmgmtdbdatabase
+cognitodomain: /sf-arc-saas/dev/cognito_domain
+cognitoid: /sf-arc-saas/dev/cognito_id
+cognitosecret: /sf-arc-saas/dev/cognito_secret
