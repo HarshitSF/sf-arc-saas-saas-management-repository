@@ -1,0 +1,370 @@
+# Default values for helm.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+strategy:
+  type: RollingUpdate
+  maxUnavailable: 0
+  maxSurge: 1
+app:
+  url: ""
+  basePath: ""
+livenessProbe:
+  enabled: false
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 7
+readinessProbe:
+  enabled: false
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 5
+
+frontend:
+  enabled: true
+  repository: public.ecr.aws/p1a1c8p2/sourcefuse-arc-saas-application-plane-ui
+  pullPolicy: Always
+  tag: "0.0.4"
+  log_level: "info"
+  home_path: "/home"
+  replicaCount: 1
+  affinity: {}
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "2"
+  Service:
+    type: NodePort
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  extraAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "3000"
+    sidecar.istio.io/inject: "false"
+    enabled: "1"
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 20
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 80
+
+
+#Services
+#featureService
+featureService:
+  enabled: true
+  repository: public.ecr.aws/p1a1c8p2/sourcefuse-arc-saas-silo-application-plane-feature-toggle-service
+  pullPolicy: Always
+  tag: "0.0.5"
+  replicaCount: 1
+  port: 3000
+  node_env: "production"
+  log_level: "info"
+  db_ssl: false
+  timestamp_tolerance: 300
+  affinity: {}
+  allowed_origins: "*"
+  imagePullPolicy:
+    enabled: "yes"
+    name: regcred
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "2048Mi"
+      cpu: "1"
+  service:
+    type: NodePort
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 1
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 80
+  base_path: /feature-service
+
+#authenticationService
+authenticationService:
+  enabled: true
+  repository: public.ecr.aws/p1a1c8p2/sourcefuse-arc-saas-application-plane-silo-authentication-service
+  pullPolicy: Always
+  tag: "0.0.3"
+  replicaCount: 1
+  port: 3000
+  node_env: "production"
+  log_level: "info"
+  db_ssl: false
+  affinity: {}
+  allowed_origins: "*"
+  imagePullPolicy:
+    enabled: "yes"
+    name: regcred
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "2048Mi"
+      cpu: "1"
+  service:
+    type: NodePort
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 1
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 80
+  base_path: /authentication-service
+
+#notificationService
+notificationService:
+  enabled: true
+  repository: public.ecr.aws/p1a1c8p2/sourcefuse-arc-saas-silo-application-plane-notification-service
+  pullPolicy: Always
+  tag: "0.0.1"
+  replicaCount: 1
+  port: 3000
+  node_env: "production"
+  log_level: "info"
+  db_ssl: false
+  affinity: {}
+  allowed_origins: "*"
+  imagePullPolicy:
+    enabled: "yes"
+    name: regcred
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "2048Mi"
+      cpu: "1"
+  service:
+    type: NodePort
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 1
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 80
+  base_path: /notification-service
+
+#userTenantService
+userTenantService:
+  enabled: true
+  repository: public.ecr.aws/p1a1c8p2/sourcefuse-arc-saas-application-plane-user-tenant-service
+  pullPolicy: Always
+  tag: "0.0.2"
+  replicaCount: 1
+  port: 3000
+  node_env: "production"
+  log_level: "info"
+  db_ssl: false
+  affinity: {}
+  allowed_origins: "*"
+  imagePullPolicy:
+    enabled: "yes"
+    name: regcred
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "2048Mi"
+      cpu: "1"
+  service:
+    type: NodePort
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 1
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 80
+  base_path: /user-tenant-service
+
+videoConfrencingService:
+  enabled: true
+  repository: public.ecr.aws/p1a1c8p2/sourcefuse-arc-saas-silo-application-plane-video-conferencing-service
+  pullPolicy: Always
+  tag: "0.0.1"
+  replicaCount: 1
+  port: 3000
+  node_env: "production"
+  log_level: "info"
+  db_ssl: false
+  affinity: {}
+  allowed_origins: "*"
+  imagePullPolicy:
+    enabled: "yes"
+    name: regcred
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "2048Mi"
+      cpu: "1"
+  service:
+    type: NodePort
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 1
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 80
+  base_path: /video-confrencing-service
+
+#migrationJob
+migrationJob:
+#enable it when correct image has been provided
+  enabled: true
+  repository: public.ecr.aws/p1a1c8p2/sourcefuse-arc-saas-silo-application-plane-migration
+  pullPolicy: Always
+  tag: "0.0.4"
+  replicaCount: 1
+  port: 3000
+  node_env: "production"
+  log_level: "info"
+  affinity: {}
+  allowed_origins: "*"
+  imagePullPolicy:
+    enabled: "yes"
+    name: regcred
+  service:
+    type: NodePort
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+
+##Common env's
+
+#Common URL'S
+
+imagePullSecret:
+#enable it and pass the correct parameters below
+  enabled: false
+  name: regcred
+  registry: https://index.docker.io/v1/
+  username: ''
+  password: ''
+  email: sfdevops@sourcefuse.com
+
+nameOverride: ""
+
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+# fsGroup: 2000
+
+securityContext: {}
+# capabilities:
+#   drop:
+#   - ALL
+# readOnlyRootFilesystem: true
+# runAsNonRoot: true
+# runAsUser: 1000
+
+resources: {}
+# We usually recommend not to specify default resources and to leave this as a conscious
+# choice for the user. This also increases chances charts run on environments with little
+# resources, such as Minikube. If you do want to specify resources, uncomment the following
+# lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+# limits:
+#   cpu: 100m
+#   memory: 128Mi
+# requests:
+#   cpu: 100m
+#   memory: 128Mi
+
+extraAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "3000"
+  sidecar.istio.io/inject: "true"
+  enabled: "1"
+
+nodeSelector: {}
+
+tolerations:
+  - effect: NoSchedule
+    key: pooled-node
+    operator: Equal
+    value: "pooled"
+
+affinity: {}
+
+#Migration Job Variable
+tenantKey: uir46
+tenantName: standard-new pvt ltd
+tenantSecret: 56b2c25fb39832ca0fd507f6361291f6
+tenantID: 6a73dcd0-bfe7-cf51-0295-91d200baf58f
+tenantEmail: harshit.kumar+15@sourcefuse.com
+cognitoUser: uir46
+cognitoSub: 885113e0-7051-70d1-d733-a7d67d302c3a
+adminUserTenantId: "b439829b-57e7-49d8-bb23-8ccb2ca56435"
+#userCallbackSecret: "yugeyifgweyfgy"
+userCallbackSecret: 56b2c25fb39832ca0fd507f6361291f6
+
+# Frontend variable
+clientId: uir46-bfe7-cf51-0295-91d200baf58f-5u7n9a
+publicKey: bfe7-cf51-0295-91d200baf58f-i7s9zp
+
+tier: standard
+namespace: standard-uir46
+region: us-west-2
+cognitodomain: /sf-arc-saas/dev/standard/cognito_domain
+cognitoid: /sf-arc-saas/dev/standard/cognito_id
+cognitosecret: /sf-arc-saas/dev/standard/cognito_secret
+karpenterRoleName: karpenter-sf-arc-saas-dev-eks-cluster-20240620060226029000000005
+eksClusterName: sf-arc-saas-dev-eks-cluster
+hostname: uir46.arc-saas.net
+tenant: uir46
+arn: arn:aws:iam::471112653618:role/sf-arc-saas-dev-standard-uir46-iam-role
+dbhost: /sf-arc-saas/dev/standard/uir46/db_host
+dbport: /sf-arc-saas/dev/standard/uir46/db_port
+dbuser: /sf-arc-saas/dev/standard/uir46/db_user
+dbpassword: /sf-arc-saas/dev/standard/uir46/db_password
+dbschema: /sf-arc-saas/dev/standard/uir46/db_schema
+redishost: /sf-arc-saas/dev/standard/uir46/redis_host
+redisport: /sf-arc-saas/dev/standard/uir46/redis_port
+redisdatabase: /sf-arc-saas/dev/standard/uir46/redis-database
+jwtsecret: /sf-arc-saas/dev/standard/uir46/jwt_secret
+jwtissuer: /sf-arc-saas/dev/standard/uir46/jwt_issuer
+authenticationdbdatabase: /sf-arc-saas/dev/standard/uir46/authenticationdbdatabase
+featuredbdatabase: /sf-arc-saas/dev/standard/uir46/featuredbdatabase
+notificationdbdatabase: /sf-arc-saas/dev/standard/uir46/notificationdbdatabase
+videoconfrencingdbdatabase: /sf-arc-saas/dev/standard/uir46/videoconfrencingdbdatabase
