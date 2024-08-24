@@ -106,8 +106,8 @@ phases:
       - envsubst < config.txt > config.${TIER}.hcl
       - envsubst <tfvariables.txt> ${TIER}.tfvars
       # Run Terraform to create pooled infra 
-      #- terraform init --backend-config=config.${TIER}.hcl
-      #- terraform destroy -auto-approve
+      - terraform init --backend-config=config.${TIER}.hcl
+      - terraform destroy -auto-approve
       - cd ..
 
       # Creating terraform backend config and tfvars at run time and Run terraform to create resources for tenant
